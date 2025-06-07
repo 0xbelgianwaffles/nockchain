@@ -160,6 +160,13 @@ pub fn bitcoin_watcher_driver(
                     handle.poke(wire, poke_slab).await?;
                     debug!("Genesis template set successfully");
 
+                    // Poke with a dummy proof-of-work to trigger the genesis block submission
+                    let mut pow_slab = NounSlab::new();
+                    let pow_poke = T(&mut pow_slab, &[D(tas!(b"command")), D(tas!(b"pow")), D(0), D(0), D(0), D(0)]);
+                    pow_slab.set_root(pow_poke);
+                    handle.poke(wire, pow_slab).await?;
+                    debug!("dummy pow poke for genesis sent successfully");
+
                     // Signal that initialization is complete
                     if let Some(tx) = init_signal_tx {
                         let _ = tx.send(());
@@ -231,6 +238,14 @@ pub fn bitcoin_watcher_driver(
                     let poke_slab = make_test_genesis_block(&message);
                     handle.poke(wire, poke_slab).await?;
                     debug!("test genesis block template sent successfully");
+
+                    // Poke with a dummy proof-of-work to trigger the genesis block submission
+                    let mut pow_slab = NounSlab::new();
+                    let pow_poke = T(&mut pow_slab, &[D(tas!(b"command")), D(tas!(b"pow")), D(0), D(0), D(0), D(0)]);
+                    pow_slab.set_root(pow_poke);
+                    handle.poke(wire, pow_slab).await?;
+                    debug!("dummy pow poke for genesis sent successfully");
+
                     // Signal that initialization is complete
                     if let Some(tx) = init_signal_tx {
                         let _ = tx.send(());
