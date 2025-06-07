@@ -164,6 +164,7 @@ pub fn bitcoin_watcher_driver(
                     let mut pow_slab = NounSlab::new();
                     let pow_poke = T(&mut pow_slab, &[D(tas!(b"command")), D(tas!(b"pow")), D(0), D(0), D(0), D(0)]);
                     pow_slab.set_root(pow_poke);
+                    let wire = SystemWire.to_wire();
                     handle.poke(wire, pow_slab).await?;
                     debug!("dummy pow poke for genesis sent successfully");
 
@@ -231,11 +232,11 @@ pub fn bitcoin_watcher_driver(
             }
         } else {
             debug!("No Bitcoin RPC connection provided, using test genesis block");
-            let wire = SystemWire.to_wire();
             match node_type {
                 GenesisNodeType::Leader => {
                     debug!("Creating test genesis block for leader node");
                     let poke_slab = make_test_genesis_block(&message);
+                    let wire = SystemWire.to_wire();
                     handle.poke(wire, poke_slab).await?;
                     debug!("test genesis block template sent successfully");
 
@@ -243,6 +244,7 @@ pub fn bitcoin_watcher_driver(
                     let mut pow_slab = NounSlab::new();
                     let pow_poke = T(&mut pow_slab, &[D(tas!(b"command")), D(tas!(b"pow")), D(0), D(0), D(0), D(0)]);
                     pow_slab.set_root(pow_poke);
+                    let wire = SystemWire.to_wire();
                     handle.poke(wire, pow_slab).await?;
                     debug!("dummy pow poke for genesis sent successfully");
 
@@ -270,6 +272,7 @@ pub fn bitcoin_watcher_driver(
                     );
                     poke_slab.set_root(poke_noun);
 
+                    let wire = SystemWire.to_wire();
                     handle.poke(wire, poke_slab).await?;
                     debug!("btc-data command for fake genesis block sent successfully");
                     // Signal that initialization is complete
